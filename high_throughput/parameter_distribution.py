@@ -53,9 +53,9 @@ def distribution_parameters(series):
     """ Function to tabulate various parameters about each distribution
     """
     return pd.Series(
-        data = [np.mean(series), np.std(series), stats.skew(series),
+        data = [np.mean(series), np.std(series)**2, stats.skew(series),
                 stats.kurtosis(series)],
-        index = ['mean', 'stdv',  'skew',  'kurt']
+        index = ['mean', 'var',  'skew',  'kurt']
     )
 
 

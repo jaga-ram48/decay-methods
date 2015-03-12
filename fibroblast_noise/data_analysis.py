@@ -32,6 +32,8 @@ def estimate_noise_and_phase(series):
         'start_ind'    : zero_crossings[0],
         'noise'        : (dwt_dict['components'][:,:3].sum(1).std() /
                           amplitudes.mean()),
+        'period_05'    : np.percentile(periods, 5),
+        'period_95'    : np.percentile(periods, 95),
     })
 
 
@@ -129,6 +131,9 @@ data_s.index = data_s.index.values - data_s.index[0]
 data_s_sorted = data_s.T.join(noise_sort.iloc[:,-1:])
 data_s_sorted = data_s_sorted.set_index('noise_rank').sort_index()
 
+stats_sorted = stats.join(noise_sort.iloc[:,-1:])
+stats_sorted = stats_sorted.set_index('noise_rank').sort_index()
+
 
 # Next we preprocess the bioluminescence profiles to make sure the
 # additions are representative
@@ -189,7 +194,7 @@ bootstrap_values = pd.DataFrame(bootstrap_values,
 p_vals = (bootstrap_values >= test_statistics).sum(0)/float(n_rep)
 
 
-from methods.PlotOptions import PlotOptions, color_rotation
+from methods.PlotOptions import PlotOptions, color_rotation, layout_pad
 PlotOptions(uselatex=True)
 import matplotlib.pylab as plt
 import matplotlib
@@ -279,3 +284,27 @@ ax3.set_yticks([-1, 0, 1, 2])
 
 ax3.legend(loc='upper right')
 
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+x = np.arange(len(stats)) + 1
+period_mu_sort = stats.period_mu.argsort().values
+ax.errorbar(
+    x, stats.iloc[period_mu_sort].period_mu,
+    yerr=[stats.iloc[period_mu_sort].period_mu -
+          stats.iloc[period_mu_sort].period_05,
+          stats.iloc[period_mu_sort].period_95 -
+          stats.iloc[period_mu_sort].period_mu],
+    color='#262626', elinewidth=0.5, capthick=0.5, capsize=1.5,
+    zorder=1, linestyle='none')
+
+ax.plot(x, stats.iloc[period_mu_sort].period_mu, 'o',
+        color='#377EB8', markersize=2, zorder=2)
+
+ax.axhspan(stats.period_mu.quantile(0.05),
+           stats.period_mu.quantile(0.95), zorder=0, color='0.85')
+
+ax.set_ylabel('Period (days)')
+ax.set_xlabel('Cell Index (sorted by mean period)')
+fig.tight_layout(**layout_pad)

@@ -1,3 +1,6 @@
+# Archives
+*.tar.gz
+
 *.py[cod]
 
 # VIM swap files
