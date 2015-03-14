@@ -308,3 +308,10 @@ ax.axhspan(stats.period_mu.quantile(0.05),
 ax.set_ylabel('Period (days)')
 ax.set_xlabel('Cell Index (sorted by mean period)')
 fig.tight_layout(**layout_pad)
+
+
+# # This calculates the fraction of cells with greater cycle-to-cycle
+# # variability than the overall cell-to-cell variability
+# cell_diff = stats.period_mu.quantile(.95) - stats.period_mu.quantile(.05)
+# sum((stats.period_95 - stats.period_05) > cell_diff)/float(len(stats))
+
